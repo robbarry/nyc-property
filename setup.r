@@ -23,7 +23,7 @@ data.files$use.year <-
          data.files$year)
 
 # AND because of the Department of Finance...
-data.files$use.boro <- ifelse(data.files$year > "2013" & data.files$boro == "si", "statenisland", data.files$boro)
+data.files$use.boro <- ifelse(data.files$year > "2006" & data.files$boro == "si", "statenisland", data.files$boro)
 
 # And also because these guys! They change the URL like every year...
 data.files$remote.filename <-

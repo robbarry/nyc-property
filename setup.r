@@ -4,6 +4,7 @@ source("https://raw.githubusercontent.com/robbarry/r-lib/master/base.r")
 usePackage("readxl")
 usePackage("plyr")
 
+# Set this path to the directory above wherever you have the repository
 repos <- "r:/repos"
 dest.path <- "data/dof/downloads/"
 setwd(paste(repos, "nyc-property", sep = "/"))

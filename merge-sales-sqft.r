@@ -22,7 +22,7 @@ read.property.data <- function(boro, year, current.year = 2015, skip = 4) {
   # Because the city's most recent data is actually a year's worth of
   # rolling sales, we'll have duplicates if we don't do this...
   if (year == current.year)
-    data <- subset(data, sale.date >= as.Date(paste0(current.year, "01-01")))
+    data <- subset(data, sale.date >= as.Date(paste0(current.year, "-01-01")))
   return(data)
 }
 

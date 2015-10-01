@@ -48,4 +48,4 @@ colnames(sqft.data) <- tolower(colnames(sqft.data))
 colnames(sqft.data)[4] <- "gr.sqft"
 
 sale.data.sqft <- merge(sale.data, sqft.data, all.x = T, all.y = F)
-write.csv(sale.data, "data/output/sale-data.csv", row.names = F)
+write.csv(sale.data.sqft, "data/output/sale-data.csv", row.names = F)

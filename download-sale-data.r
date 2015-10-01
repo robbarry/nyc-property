@@ -1,6 +1,6 @@
 
 # Download NYC sale data
-source("setup.r")
+source("r:/repos/nyc-property/setup.r")
 
 data.files <- get.data.files()
 

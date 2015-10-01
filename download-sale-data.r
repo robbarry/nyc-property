@@ -1,7 +1,8 @@
 
 # Download NYC sale data
-
 source("setup.r")
+
+data.files <- get.data.files()
 
 download.sale.data <- function(data.files) {
   for (i in 1:nrow(data.files)) {

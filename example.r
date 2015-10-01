@@ -3,10 +3,12 @@
 source("r:/repos/nyc-property/setup.r")
 usePackage("ggplot2")
 usePackage("lubridate")
+usePackage("scales")
 
 sale.data <- read.csv("data/output/sale-data.csv")
 
 sale.data$sale.year <- year(sale.data$sale.date)
+sale.data$sale.month <- year(sale.data$sale.date) + (month(sale.data$sale.date) - 1) / 12
 sale.data$ppsqft <- with(sale.data, sale.price / gr.sqft)
 
 # Let's just look at elevator equipped condos built within 10 years of the current
@@ -22,21 +24,24 @@ extract <- subset(sale.data,
 analysis <-
   ddply(
     extract,
-    c("sale.year", "boro"),
+    c("sale.month", "boro"),
     summarise,
     median.ppsqft = median(ppsqft)
   )
 
 
 plt <- ggplot(analysis,
-              aes(x = sale.year, y = median.ppsqft,
+              aes(x = sale.month, y = median.ppsqft,
                   color = factor(boro, labels =
                                    c("Manhattan", "Bronx", "Brooklyn",
                                      "Queens", "Staten Island"))))
-plt <- plt + geom_line(size = 2)
+plt <- plt + geom_line(size = 1.4)
 plt <- plt + theme_bw()
 plt <- plt + ggtitle("Median Price Per Sqft\nNew, elevator-equipped condos")
 plt <- plt + theme(legend.title = element_blank())
+plt <- plt + xlab("Sale date")
+plt <- plt + ylab("Median price per square foot")
+plt <- plt + scale_y_continuous(labels = dollar)
 plt
 
 

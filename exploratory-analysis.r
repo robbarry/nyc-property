@@ -58,7 +58,6 @@ share_diff[order(share_diff, decreasing = T)][1:5]
 share_diff[order(share_diff)][1:4]
 # That's elevator condos & co-ops, walk-up co-ops and co-ops in condos.
 
-
 #####################################
 # What do nonzero prices look like? #
 #####################################
@@ -120,6 +119,51 @@ share_diff[order(share_diff)][1:2]
 nrow(subset(sale.data, sale.price == 0)) # 329,326
 nrow(subset(sale.data, sale.price < 100000 & sale.price > 0)) # 71,893
 nrow(subset(sale.data, sale.price > 0)) # 773,177
+
+#######################
+# SQUARE FOOTAGE DATA #
+#######################
+
+# I suspect we'll have fewer historical sales with square footage data
+# given the current setup for this analysis. Let's check if that's true.
+# At some point, gonna have to figure out all those NA values...
+extract <- subset(sale.data, !is.na(sale.year))
+
+pdata <-
+  ddply(extract,
+        c("sale.year"),
+        summarise,
+        percent_no_sqft = sum(is.na(gr.sqft)) / length(sale.date)
+        )
+
+# These are not the results I was expecting...
+plot(pdata$sale.year, pdata$percent_no_sqft, type = "h", lwd = 20, lend = 1,
+     frame = F)
+
+# Let's do it by year built...
+pdata <-
+  ddply(subset(extract, year.built > 1800),
+        c("year.built"),
+        summarise,
+        percent_no_sqft = sum(is.na(gr.sqft)) / length(sale.date)
+  )
+
+plot(pdata$year.built, pdata$percent_no_sqft, type = "h", lwd = 2, lend = 1,
+     frame = F)
+
+# So it's mostly very old and very new stuff... the very new stuff could be
+# extremely problematic...
+pdata <-
+  ddply(subset(extract, year.built >= 2000),
+        c("year.built"),
+        summarise,
+        percent_no_sqft = sum(is.na(gr.sqft)) / length(sale.date)
+  )
+
+# The spike begins in 2012. Fewer than 50% of buildings built in 2015 have
+# square footage data associated with them...
+plot(pdata$year.built, pdata$percent_no_sqft, type = "h", lwd = 20, lend = 1,
+     frame = F)
 
 
 

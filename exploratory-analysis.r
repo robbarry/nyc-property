@@ -43,11 +43,27 @@ plt <- plt + xlab("Sale Year") + ylab("Percent")
 plt <- plt + theme_bw()
 plt
 
+# What types of properties are selling for $0?
+extract <- subset(sale.data, sale.price == 0)
+t1 <- table(extract$bldg.class.sale)
+t2 <- table(sale.data$bldg.class.sale)
+t1_per <- t1 / sum(t1)
+t2_per <- t2 / sum(t2)
+
+share_diff <- t1_per - t2_per[names(t1_per)]
+plot(share_diff, ylim = c(min(share_diff), max(share_diff)))
+# Not a lot of over-representation here... it's pretty spread out.
+share_diff[order(share_diff, decreasing = T)][1:5]
+# On the underrepresentation side, it's clearly four groups: D4, R4, C6 and R9
+share_diff[order(share_diff)][1:4]
+# That's elevator condos & co-ops, walk-up co-ops and co-ops in condos.
+
+
 #####################################
 # What do nonzero prices look like? #
 #####################################
 
-# There are too many sale prices at 10^0, 10^1, 10^2 & 10^3...
+# There are too many sales priced at 10^0, 10^1, 10^2 & 10^3...
 dens <-
   with(subset(sale.data, sale.price > 0),
        density(log(sale.price, 10), na.rm = T)
@@ -55,6 +71,61 @@ dens <-
 plot(dens)
 pts <- unlist(lapply(0:3, function(z) { which.min(abs(dens$x - z)) } ))
 points(dens$x[pts], dens$y[pts], col = "red")
+
+# If we focus just on sales under $100,000, the problems with the
+# distribution are even more clear.
+
+dens <-
+  with(subset(sale.data, sale.price > 0 & sale.price < 100000),
+       density(log(sale.price, 10), na.rm = T)
+       )
+plot(dens)
+pts <- unlist(lapply(0:5, function(z) { which.min(abs(dens$x - z)) } ))
+points(dens$x[pts], dens$y[pts], col = "red")
+
+# What about sales between $10,000 and $190,000?
+dens <-
+  with(subset(sale.data, sale.price > 10000 & sale.price < 190000),
+       density(log(sale.price, 10), na.rm = T, n = 1024)
+  )
+plot(dens)
+# The local maxima are clustered around $20K, $25K, $35K, $50K.
+delta <- diff(dens$y)
+cm <- c(F, sign(delta[-1]) == -1 & sign(delta[-length(delta)]) == 1)
+points(dens$x[cm], dens$y[cm], col = "red")
+10^dens$x[cm]
+
+# Let's look at buildings between $20K and $50K...
+extract <- subset(sale.data, sale.price >= 20000 & sale.price <= 50000)
+
+t1 <- table(extract$bldg.class.sale)
+t2 <- table(sale.data$bldg.class.sale)
+t1_per <- t1 / sum(t1)
+t2_per <- t2 / sum(t2)
+# The disproportionate representation...
+share_diff <- t1_per - t2_per[names(t1_per)]
+plot(share_diff, ylim = c(min(share_diff), max(share_diff)))
+# Two groups are heavily overy represented: R5 and H2.
+# That's condo miscellaneous commercial and luxury hotels built after
+# 1960.
+share_diff[order(share_diff, decreasing = T)][1:2]
+
+# On the other side, the conspiciously absent codes are R4 and D4:
+# elevator condos and elevator co-ops.
+share_diff[order(share_diff)][1:2]
+
+# There are 329,326 sales with a zero-dollar consideration.
+# Of the remaining sales, 71,893 (9% of non-zero sales) were
+# for under $100K.
+nrow(subset(sale.data, sale.price == 0)) # 329,326
+nrow(subset(sale.data, sale.price < 100000 & sale.price > 0)) # 71,893
+nrow(subset(sale.data, sale.price > 0)) # 773,177
+
+
+
+#########################
+# SOME CURSORY ANALYSIS #
+#########################
 
 # Let's just look at elevator equipped condos built within 10 years of the current
 # sales year.
